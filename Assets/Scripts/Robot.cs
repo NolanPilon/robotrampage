@@ -17,6 +17,12 @@ public class Robot : MonoBehaviour
     public Animator robot;
     [SerializeField]
     GameObject missileprefab;
+    [SerializeField]
+    private AudioClip deathSound;
+    [SerializeField]
+    private AudioClip fireSound;
+    [SerializeField]
+    private AudioClip weakHitSound;
     void Start()
     {
         isDead = false;
@@ -38,16 +44,17 @@ public class Robot : MonoBehaviour
         if (Vector3.Distance(transform.position, player.position) < range && Time.time - timeLastFired > fireRate) 
         {
             timeLastFired = Time.time;
-            fire();
+            Fire();
         }
     }
 
-    private void fire() 
+    private void Fire() 
     {
         GameObject missile = Instantiate(missileprefab);
         missile.transform.position = missileFireSpot.transform.position;
         missile.transform.rotation = missileFireSpot.transform.rotation;
         robot.Play("Fire");
+        GetComponent<AudioSource>().PlayOneShot(fireSound);
     }
     public void TakeDamage(int amount)
     {
@@ -61,6 +68,11 @@ public class Robot : MonoBehaviour
             isDead = true;
             robot.Play("Die");
             StartCoroutine("DestroyRobot");
+            GetComponent<AudioSource>().PlayOneShot(deathSound);
+        }
+        else 
+        {
+            GetComponent<AudioSource>().PlayOneShot(weakHitSound);
         }
     }
     IEnumerator DestroyRobot()
